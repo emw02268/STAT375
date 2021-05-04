@@ -1,0 +1,99 @@
+---
+title: "Stat375 Project"
+author: "Emily Wilson"
+date: "5/4/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(parallelDist)
+library(tidyverse)
+library(mosaic)
+library(dplyr)
+library(RISmed)
+library(stargazer)
+library(ISLR)
+library(caret)
+library(randomForest)
+library(ROSE)
+library(caret)
+library(rattle) 
+library(flextable)
+library(huxtable)
+library(jtools)
+``` 
+
+
+
+
+### Data
+
+```{r}
+deepsolar <- read.csv("deepsolar_tract 2.csv")
+deepsolar1<-na.omit(deepsolar)
+```
+
+
+
+### Principal Component Analysis
+
+```{r}
+solar <- deepsolar1[,1:34]
+model <- prcomp(solar,scale. = T)
+summary(model)
+model$rotation
+```
+
+```{r}
+plot(model)
+biplot(model)
+```
+
+### Classification tree
+
+```{r}
+tc <- trainControl(method="cv", number = 9)
+
+fit=train(solar_system_count~average_household_size+land_area+race_white+daily_solar_radiation,method="rpart",trControl=tc, data=deepsolar1)
+
+fancyRpartPlot(fit$finalModel)
+
+fit
+plot(fit$finalModel,margin=.1)
+text(fit$finalModel)
+title(main="regression tree for predicting solar")
+```
+
+```{r}
+tc <- trainControl(method="cv", number = 9)
+
+fit=train(solar_system_count~average_household_income+gini_index+heating_fuel_other+age_median+average_household_size+heating_fuel_solar,method="rpart",trControl=tc, data=deepsolar1)
+
+fancyRpartPlot(fit$finalModel)
+
+fit
+plot(fit$finalModel,margin=.1)
+text(fit$finalModel)
+title(main="regression tree for predicting solar")
+```
+
+
+
+### Regression Modeling 
+
+```{r}
+model1<-lm(solar_system_count~average_household_income+gini_index+heating_fuel_other+age_median+average_household_size+heating_fuel_solar+solar_system_count_residential, data=deepsolar1)
+summary(model1)
+```
+
+### Regression PCA 6
+
+```{r}
+model1.1<-lm(solar_system_count~average_household_size+land_area+race_white+daily_solar_radiation, data=deepsolar1)
+summary(model1.1)
+export_summs(model1.1)
+```
+
+
+
